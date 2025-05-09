@@ -30,12 +30,13 @@ const rotate = (currentDir, turnOffset) => {
 };
 
 // Handle Rover Move
+const calcNewPosition = ({ x, y }, direction, stepOffset) => ({
+    x: x + (DIRECTIONS_DELTAS[direction].x * stepOffset),
+    y: y + (DIRECTIONS_DELTAS[direction].y * stepOffset),
+})
+
 const move = ({ x, y }, direction, obstacles, stepOffset) => {
-    const delta = DIRECTIONS_DELTAS[direction];
-    const nextDelta = {
-        x: x + (delta.x * stepOffset),
-        y: y + (delta.y * stepOffset),
-    };
+    const nextDelta = calcNewPosition({ x, y }, direction, stepOffset)
 
     const key = `${nextDelta.x},${nextDelta.y}`;
     const isCollision = obstacles?.has(key);
@@ -84,4 +85,4 @@ const executeCommand = (initX, initY, initDirection, command, obstacles = []) =>
         : resWithoutObstacles
 };
 
-module.exports = { executeCommand };
+module.exports = { executeCommand, rotate, calcNewPosition };
