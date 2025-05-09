@@ -37,7 +37,9 @@ const move = ({ x, y }, direction, obstacles, stepOffset) => {
         y: y + (delta.y * stepOffset),
     };
 
-    const isCollision = obstacles?.some(([obsX, obsY]) => obsX === nextDelta.x && obsY === nextDelta.y);
+    const key = `${nextDelta.x},${nextDelta.y}`;
+    const isCollision = obstacles?.has(key);
+    console.log(isCollision, key, obstacles);
 
     return isCollision
         ? { position: { x, y }, direction, status: "STOPPED" }
@@ -58,14 +60,14 @@ const reduceCommand = (cmd, state) => {
     return execute();
 };
 
-const executeCommand = (initX, initY, initDirection, command, obstacles) => {
+const executeCommand = (initX, initY, initDirection, command, obstacles = []) => {
     const cleanDir = getCleanStr(initDirection);
     const cleanCommand = getCleanStr(command);
 
     let state = {
         position: { x: initX, y: initY },
         direction: cleanDir,
-        obstacles,
+        obstacles: new Set(obstacles.map(([x, y]) => `${x},${y}`)),
     };
 
     state = [...cleanCommand].reduce((currentState, cmd) => {
@@ -84,5 +86,4 @@ const executeCommand = (initX, initY, initDirection, command, obstacles) => {
 };
 
 module.exports = { executeCommand };
-
-console.log(executeCommand(0, 0, 'NORTH', 'FLF', [[0,1]]))
+console.log(executeCommand(0, 0, 'NORTH', 'F', [[0, 1]]));
