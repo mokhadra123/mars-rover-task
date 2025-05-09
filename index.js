@@ -6,7 +6,7 @@ const DIRECTIONS_DELTAS = {
     EAST: { x: 1, y: 0 },
     SOUTH: { x: 0, y: -1 },
     WEST: { x: -1, y: 0 },
-}
+};
 
 // Handle Validation to return clean string.
 const getCleanStr = (str) => {
@@ -30,22 +30,25 @@ const rotate = (currentDir, turnOffset) => {
 };
 
 // Handle Rover Move
-const move = ({ x, y }, direction, stepOffset) => {
+const move = ({ x, y }, direction, obstacles, stepOffset) => {
     const delta = DIRECTIONS_DELTAS[direction];
-
     const nextDelta = {
         x: x + (delta.x * stepOffset),
         y: y + (delta.y * stepOffset),
-    }
+    };
 
-    return { position: nextDelta, direction }
+    const isCollision = obstacles?.some(([obsX, obsY]) => obsX === nextDelta.x && obsY === nextDelta.y);
+
+    return isCollision
+        ? { position: { x, y }, direction, status: "STOPPED" }
+        : { position: nextDelta, direction };
 };
 
 const getCommandMap = (state) => ({
-    R: () => ({ ...state, direction: rotate(state.direction, 1) }),
-    L: () => ({ ...state, direction: rotate(state.direction, -1) }),
-    F: () => move(state.position, state.direction, 1),
-    B: () => move(state.position, state.direction, -1),
+    R: () => ({ direction: rotate(state.direction, 1) }),
+    L: () => ({ direction: rotate(state.direction, -1) }),
+    F: () => move(state.position, state.direction, state.obstacles, 1),
+    B: () => move(state.position, state.direction, state.obstacles, -1),
 });
 
 const reduceCommand = (cmd, state) => {
@@ -53,25 +56,33 @@ const reduceCommand = (cmd, state) => {
     assert(VALID_COMMANDS.includes(cmd), `wrong command: ${cmd}`)
 
     return execute();
-}
+};
 
-const executeCommand = (initX, initY , initDirection, command) => {
+const executeCommand = (initX, initY, initDirection, command, obstacles) => {
     const cleanDir = getCleanStr(initDirection);
     const cleanCommand = getCleanStr(command);
 
     let state = {
         position: { x: initX, y: initY },
         direction: cleanDir,
+        obstacles,
     };
 
     state = [...cleanCommand].reduce((currentState, cmd) => {
         const newState = reduceCommand(cmd, currentState)
 
-        return newState;
+        return newState.status || currentState.status
+            ? { ...currentState, status: "STOPPED" }
+            : { ...currentState, ...newState }
     }, state)
 
     const { x, y } = state.position;
-    return `(${x}, ${y}) ${state.direction}`
-}
+    const resWithoutObstacles = `(${x}, ${y}) ${state.direction}`
+    return state.status
+        ? `${resWithoutObstacles} ${state.status}`
+        : resWithoutObstacles
+};
 
 module.exports = { executeCommand };
+
+console.log(executeCommand(0, 0, 'NORTH', 'FLF', [[0,1]]))
