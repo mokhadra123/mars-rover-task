@@ -39,7 +39,6 @@ const move = ({ x, y }, direction, obstacles, stepOffset) => {
 
     const key = `${nextDelta.x},${nextDelta.y}`;
     const isCollision = obstacles?.has(key);
-    console.log(isCollision, key, obstacles);
 
     return isCollision
         ? { position: { x, y }, direction, status: "STOPPED" }
@@ -86,4 +85,3 @@ const executeCommand = (initX, initY, initDirection, command, obstacles = []) =>
 };
 
 module.exports = { executeCommand };
-console.log(executeCommand(0, 0, 'NORTH', 'F', [[0, 1]]));
