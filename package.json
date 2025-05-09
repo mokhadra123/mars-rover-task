@@ -4,7 +4,7 @@
   "description": "rover marc task",
   "main": "index.js",
   "scripts": {
-    "test": "test --watchAll"
+    "test": "jest --watchAll"
   },
   "author": "mohamed khadra",
   "license": "ISC",
