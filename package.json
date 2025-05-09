@@ -1,0 +1,14 @@
+{
+  "name": "rover_marc",
+  "version": "1.0.0",
+  "description": "rover marc task",
+  "main": "index.js",
+  "scripts": {
+    "test": "test --watchAll"
+  },
+  "author": "mohamed khadra",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
